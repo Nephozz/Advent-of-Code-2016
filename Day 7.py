@@ -1,4 +1,4 @@
-inpputFile = open("input/input_day7", "r")
+inputFile = open("input/input_day7", "r")
 
 def isABBA(string):
     for i in range(len(string)-3):
@@ -14,28 +14,37 @@ def isABA(string):
     return list
 
 def supportsTLS(line):
-    for i in range(len(line)):
-        if line[i][0] == "[" and isABBA(line[i]):
-            return False
+    abba_outside = False
 
-    for i in range(len(line)):
-        if line[i][0] != "[" and isABBA(line[i]):
-            return True
+    for part in line:
+        if part[0] == "[" and isABBA(part):
+            return False
+        elif part[0] != "[" and isABBA(part):
+            abba_outside = True
+
+    return abba_outside
 
 def supportsSSL(line):
-    aba = []
-    bab = []
+    aba_list = []
+    bab_list = []
 
-    for i in range(len(line)):
-        if line[i][0] == "[" and isABA(line[i]) != []:
-            bab += isABA(line[i])
-        elif line[i][0] != "[" and isABA(line[i]) != []:
-            aba += isABA(line[i])
+    for part in line:
+        if part[0] == "[":
+            bab_list += isABA(part)
+        else:
+            aba_list += isABA(part)
+
+    for aba in aba_list:
+        bab = aba[1] + aba[0] + aba[1]
+        if bab in bab_list:
+            return True
+
+    return False
 
 numTLS = 0
 numSSL = 0
 
-for line in inpputFile:
+for line in inputFile:
     line = line.replace("[", " [").replace("]", "] ").split()
 
     if supportsTLS(line):
@@ -44,6 +53,7 @@ for line in inpputFile:
     if supportsSSL(line):
         numSSL += 1
 
-print(numSSL)
+print("Number supporting TLS : ",numTLS)
+print("Number supporting SSL : ",numSSL)
 
-inpputFile.close()
+inputFile.close()
